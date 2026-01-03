@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base64 Image Gallery</title>
+<style>
+body{font-family:sans-serif;padding:20px;background:#f0f0f0}
+.container{display:flex;flex-wrap:wrap;gap:20px;margin-top:20px}
+.image-card{display:flex;flex-direction:column;align-items:center}
+.image-card img{max-width:300px;border:1px solid #ccc}
+.filename{margin-top:5px;font-size:0.9em;color:#333}
+</style>
+</head>
+<body>
+<h2>🖼️ Base64 Image Gallery</h2>
+<div class="container" id="images"></div>
+<script>
+fetch('filelist.json')
+.then(res => res.json())
+.then(files => {
+  const container = document.getElementById('images');
+  files.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'image-card';
+    const img = document.createElement('img');
+    const base64 = f.base64;
+    let mime = "image/png";
+    if(base64.startsWith("/9j/")) mime="image/jpeg";
+    else if(base64.startsWith("iVBOR")) mime="image/png";
+    else if(base64.startsWith("AAAA")) mime="image/heic";
+    img.src = `data:${mime};base64,${base64}`;
+    card.appendChild(img);
+    const label = document.createElement('div');
+    label.className = 'filename';
+    label.textContent = f.filename;
+    card.appendChild(label);
+    container.appendChild(card);
+  });
+})
+.catch(err => console.error('Failed to load filelist.json', err));
+</script>
+</body>
+</html>
